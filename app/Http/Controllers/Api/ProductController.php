@@ -78,7 +78,25 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::find($id);
+        if(!$product){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Product not found'
+            ],404);
+        }
+
+        try{
+            return response()->json([
+                'status'=>true,
+                'product'=>$product->with(['cpu','display'])->get()
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 
     /**
@@ -102,6 +120,24 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::find($id);
+        if(!$product){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Product not found'
+            ],404);
+        }
+        try{
+            $product->delete();
+            return response()->json([
+                'status'=>true,
+                'message'=>'Success'
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 }

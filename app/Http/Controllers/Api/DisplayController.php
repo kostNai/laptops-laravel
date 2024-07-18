@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Display;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 class DisplayController extends Controller
@@ -12,7 +14,19 @@ class DisplayController extends Controller
      */
     public function index()
     {
-        //
+        $displays = Display::all();
+
+        try{
+            return response()->json([
+                'status'=>true,
+                'displays'=>$displays
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 
     /**
@@ -28,7 +42,25 @@ class DisplayController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try{
+            $new_display = Display::create([
+                'cover'=>$request->cover,
+                'matrix'=>$request->matrix,
+                'size'=>$request->size,
+                'resolution'=>$request->resolution,
+                'product_id'=>$request->product_id
+            ]);
+
+            return response()->json([
+                'status'=>true,
+                'new_display'=>$new_display
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 
     /**
