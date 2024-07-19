@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index()
     {
         try {
-            $products = Product::all();
+            $products = Product::with(['cpu','display','memory','ram','graphic'])->get();
             return response()->json([
                 'status'=>true,
                 'products'=>$products
@@ -54,7 +54,7 @@ class ProductController extends Controller
                 'multimedia'=>$request->multimedia,
                 'dimensions'=>$request->dimensions,
                 'os'=>$request->os,
-//                'cpu_id'
+                'cpu_id'=>$request->cpu_id
 //                ,'display_id'
 //                ,'memory_id'
 //                ,'ram_id'

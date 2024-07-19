@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Memory;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 class MemoryController extends Controller
@@ -12,7 +14,19 @@ class MemoryController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            $memories = Memory::all();
+
+            return response()->json([
+                'status'=>true,
+                'memories'=>$memories
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 
     /**
@@ -28,7 +42,23 @@ class MemoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try{
+            $new_memory = Memory::create([
+                'manufacturer'=>$request->manufacturer,
+                'type'=>$request->type,
+                'size'=>$request->size,
+                'product_id'=>$request->product_id,
+            ]);
+            return response()->json([
+                'status'=>true,
+                'new_memory'=>$new_memory
+            ]);
+        }catch(HttpResponseException $exception){
+            return response()->json([
+                'status'=>false,
+                'message'=>$exception->getMessage()
+            ],$exception->getCode());
+        }
     }
 
     /**

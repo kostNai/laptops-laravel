@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->string('manufacturer',100);
             $table->string('type',10);
             $table->integer('size');
+            $table->foreignIdFor(Product::class,'product_id');
             $table->timestamps();
         });
     }
