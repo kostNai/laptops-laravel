@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('manufacturer',50);
             $table->string('type',10);
             $table->integer('memory');
+            $table->string('slug');
             $table->foreignIdFor(Product::class,'product_id');
             $table->timestamps();
         });

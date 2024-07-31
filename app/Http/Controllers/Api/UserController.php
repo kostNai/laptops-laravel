@@ -3,23 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Display;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
-class DisplayController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $displays = Display::all();
-
-        try{
+        try {
+            $users = User::all();
             return response()->json([
                 'status'=>true,
-                'displays'=>$displays
+                'users'=>$users
             ]);
         }catch(HttpResponseException $exception){
             return response()->json([
@@ -42,26 +41,7 @@ class DisplayController extends Controller
      */
     public function store(Request $request)
     {
-        try{
-            $new_display = Display::create([
-                'cover'=>$request->cover,
-                'matrix'=>$request->matrix,
-                'size'=>$request->size,
-                'slug'=>$request->slug,
-                'resolution'=>$request->resolution,
-                'product_id'=>$request->product_id
-            ]);
-
-            return response()->json([
-                'status'=>true,
-                'new_display'=>$new_display
-            ]);
-        }catch(HttpResponseException $exception){
-            return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
-        }
+        //
     }
 
     /**

@@ -17,14 +17,14 @@ class GraphicController extends Controller
         try {
             $graphics = Graphic::all();
             return response()->json([
-                'status'=>true,
-                'graphics'=>$graphics
+                'status' => true,
+                'graphics' => $graphics
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
 
 
@@ -43,23 +43,24 @@ class GraphicController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        try {
             $new_graphic = Graphic::create([
-                'manufacturer'=>$request->manufacturer,
-                'series'=>$request->series,
-                'model'=>$request->model,
-                'type'=>$request->type,
-                'product_id'=>$request->product_id
+                'manufacturer' => $request->manufacturer,
+                'series' => $request->series,
+                'model' => $request->model,
+                'type' => $request->type,
+                'slug'=>$request->slug,
+                'product_id' => $request->product_id
             ]);
             return response()->json([
-                'status'=>true,
-                'new_graphic'=>$new_graphic
+                'status' => true,
+                'new_graphic' => $new_graphic
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
 
     }
@@ -71,22 +72,22 @@ class GraphicController extends Controller
     {
 
         $graphic = Graphic::find($id);
-        if(!$graphic){
+        if (!$graphic) {
             return response()->json([
-                'status'=>false,
-                'message'=>'Graphic not found'
-            ],404);
+                'status' => false,
+                'message' => 'Graphic not found'
+            ], 404);
         }
         try {
             return response()->json([
-                'status'=>true,
-                'graphic'=>$graphic
+                'status' => true,
+                'graphic' => $graphic
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
     }
 
@@ -112,23 +113,23 @@ class GraphicController extends Controller
     public function destroy(string $id)
     {
         $graphic = Graphic::find($id);
-        if(!$graphic){
+        if (!$graphic) {
             return response()->json([
-                'status'=>false,
-                'message'=>'Graphic not found'
-            ],404);
+                'status' => false,
+                'message' => 'Graphic not found'
+            ], 404);
         }
         try {
             $graphic->delete();
             return response()->json([
-                'status'=>true,
-                'message'=>'Success'
+                'status' => true,
+                'message' => 'Success'
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
     }
 }

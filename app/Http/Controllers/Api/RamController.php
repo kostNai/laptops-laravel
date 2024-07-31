@@ -46,6 +46,7 @@ class RamController extends Controller
                 'manufacturer'=>$request->manufacturer,
                 'type'=>$request->type,
                 'memory'=>$request->memory,
+                'slug'=>$request->slug,
                 'product_id'=>$request->product_id
             ]);
             return response()->json([

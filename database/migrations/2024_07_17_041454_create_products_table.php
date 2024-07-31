@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('manufacturer',50);
+            $table->float('price');
             $table->string('image',1000)->nullable()->default(null);
             $table->string('name',100);
             $table->string('model',100);
@@ -21,6 +23,8 @@ return new class extends Migration
             $table->string('multimedia',250);
             $table->string('dimensions',20);
             $table->string('os',20);
+            $table->string('description',500);
+            $table->integer('sales_count')->nullable()->default(0);
             $table->foreignId('cpu_id')->nullable()->default(null);
             $table->foreignId('display_id')->nullable()->default(null);
             $table->foreignId('memory_id')->nullable()->default(null);

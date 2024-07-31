@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
-    protected $fillable=(['image','name','model','color','weight','multimedia','dimensions','os','cpu_id','display_id','memory_id','ram_id','graphic_id']);
+    protected $fillable=(['manufacturer','price','image','name','model','color','weight','multimedia','dimensions','os','description','sales_count','cpu_id','display_id','memory_id','ram_id','graphic_id']);
 
     public function cpu():HasOne{
         return $this->hasOne(Cpu::class,'id','cpu_id');

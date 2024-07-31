@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Memory extends Model
 {
-    protected $fillable = (['manufacturer','type','size','product_id']);
+    protected $fillable = (['manufacturer','type','size','product_id','slug']);
 
     public function product():BelongsTo{
         return $this->belongsTo(Product::class);

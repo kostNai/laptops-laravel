@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Cpu extends Model
 {
-    protected $fillable = (['manufacturer','series','model','cores_value','frequency','product_id']);
+    protected $fillable = (['manufacturer','series','model','cores_value','frequency','product_id','slug']);
 
     public function product():BelongsTo{
         return $this->belongsTo(Product::class);

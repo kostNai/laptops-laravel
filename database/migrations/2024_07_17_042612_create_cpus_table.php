@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('model',50);
             $table->integer('cores_value');
             $table->integer('frequency');
+            $table->string('slug');
             $table->foreignIdFor(Product::class,'product_id');
             $table->timestamps();
         });

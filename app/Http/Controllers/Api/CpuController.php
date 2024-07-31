@@ -49,6 +49,7 @@ class CpuController extends Controller
             'model'=>$request->model,
             'cores_value'=>$request->cores_value,
             'frequency'=>$request->frequency,
+            'slug'=>$request->slug,
             'product_id'=>$request->product_id
         ]);
         return response()->json([

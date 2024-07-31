@@ -15,11 +15,11 @@ class MemoryController extends Controller
     public function index()
     {
         try{
-            $memories = Memory::all();
+            $memory_list = Memory::all();
 
             return response()->json([
                 'status'=>true,
-                'memories'=>$memories
+                'memories'=>$memory_list
             ]);
         }catch(HttpResponseException $exception){
             return response()->json([
@@ -47,6 +47,7 @@ class MemoryController extends Controller
                 'manufacturer'=>$request->manufacturer,
                 'type'=>$request->type,
                 'size'=>$request->size,
+                'slug'=>$request->slug,
                 'product_id'=>$request->product_id,
             ]);
             return response()->json([

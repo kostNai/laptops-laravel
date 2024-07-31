@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Display extends Model
 {
-    protected $fillable = (['cover','matrix','size','resolution','product_id']);
-
-
+    protected $fillable = (['cover','matrix','size','resolution','product_id','slug']);
     public function product():BelongsTo{
         return $this->belongsTo(Product::class);
     }
