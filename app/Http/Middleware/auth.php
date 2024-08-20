@@ -17,9 +17,12 @@ class  auth
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
-
-        dd($user);
-
+        if(!$user){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Помилка, будь ласка авторизуйтесь.'
+            ],401);
+        }
         return $next($request);
     }
 }

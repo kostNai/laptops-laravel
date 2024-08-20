@@ -13,6 +13,8 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory;
     protected $fillable = (['name','username','email','password','is_admin','img','token_id']);
 
+    protected $hidden = (['password']);
+
     public function token():HasOne{
         return $this->hasOne(Token::class);
     }

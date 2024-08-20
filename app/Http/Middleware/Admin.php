@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Token;
+use Carbon\Carbon;
 use Closure;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +19,6 @@ class Admin
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
-
         if (!$user) {
             return response([
                 'status' => false,

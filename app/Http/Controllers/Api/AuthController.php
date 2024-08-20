@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+
+use App\Http\Middleware\auth;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -18,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-//        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['only' => ['refresh']]);
     }
     public function register(Request $request){
         $username = $request->username;
@@ -90,6 +92,12 @@ class AuthController extends Controller
         }
 
         $user = User::where('username',$request->username)->first();
+        if(strlen($request->password)<4){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Пароль має буди не менше 4 символів'
+            ],500);
+        }
 
         if(!Hash::check($request->password,$user->password)){
             return response()->json([
@@ -163,6 +171,29 @@ class AuthController extends Controller
      */
     public function refresh()
     {
+        $current_user = auth()->user();
+
+        $user = User::where('username',$current_user->username)->first();
+        $token = Token::where('user_id',$user->id)->first();
+
+        if(!$token){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Refresh token not found'
+            ],404);
+        }
+        $new_token = auth()->refresh();
+        $token->refresh_token = $new_token;
+        $user->token_id = $token->id;
+        $access_token = auth()->claims(['username' => $user->username,'email'=>$user->email,'name'=>$user->name])->setTtl(60)->refresh();
+
+        $token->save();
+        $user->save();
+        return response()->json([
+            'status'=>true,
+            'message'=>'Success',
+            'access_token'=>$access_token
+        ]);
 
     }
 

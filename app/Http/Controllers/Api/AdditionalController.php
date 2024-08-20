@@ -7,9 +7,12 @@ use App\Models\Cpu;
 use App\Models\Display;
 use App\Models\Graphic;
 use App\Models\Memory;
+use App\Models\Product;
 use App\Models\Ram;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdditionalController extends Controller
@@ -136,12 +139,29 @@ class AdditionalController extends Controller
 
     public function getFilteredData(Request $request)
     {
-        $model = 'App\Models\\'.$request->component;
+        $model = 'App\Models\\' . $request->component;
         $unique = $model::all()->unique('slug');
 
         return response()->json([
-            'status'=>true,
-            Str::lower($request->component.'_list')=>$unique->values()
+            'status' => true,
+            Str::lower($request->component . '_list') => $unique->values()
+        ]);
+    }
+
+    public function getProductByName(string $name)
+    {
+        $product = Product::where('name', $name)->first();
+
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product not found'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'product' => $product
         ]);
     }
 

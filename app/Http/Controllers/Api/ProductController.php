@@ -22,7 +22,7 @@ class ProductController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('Admin', ['only' => ['store', 'update', 'destroy']]);
+        $this->middleware('Admin', ['only' => ['store', 'destroy','update']]);
     }
 
     public function index()
@@ -103,6 +103,7 @@ class ProductController extends Controller
                 }
             }
 
+
             $new_product = Product::create([
                 'manufacturer' => $request->manufacturer,
                 'price' => $request->price,
@@ -132,34 +133,34 @@ class ProductController extends Controller
                     'slug' => $cpu->slug
                 ]);
                 $new_display = Display::create([
-                    'cover'=>$display->cover,
-                    'matrix'=>$display->matrix,
-                    'size'=>$display->size,
-                    'resolution'=>$display->resolution,
-                    'product_id'=>$new_product->id,
-                    'slug'=>$display->slug
+                    'cover' => $display->cover,
+                    'matrix' => $display->matrix,
+                    'size' => $display->size,
+                    'resolution' => $display->resolution,
+                    'product_id' => $new_product->id,
+                    'slug' => $display->slug
                 ]);
                 $new_graphic = Graphic::create([
-                    'manufacturer'=>$graphic->manufacturer,
-                    'series'=>$graphic->series,
-                    'model'=>$graphic->model,
-                    'type'=>$graphic->type,
-                    'product_id'=>$new_product->id,
-                    'slug'=>$graphic->slug
+                    'manufacturer' => $graphic->manufacturer,
+                    'series' => $graphic->series,
+                    'model' => $graphic->model,
+                    'type' => $graphic->type,
+                    'product_id' => $new_product->id,
+                    'slug' => $graphic->slug
                 ]);
                 $new_memory = Memory::create([
-                    'manufacturer'=>$memory->manufacturer,
-                    'type'=>$memory->type,
-                    'size'=>$memory->size,
-                    'product_id'=>$new_product->id,
-                    'slug'=>$memory->slug
+                    'manufacturer' => $memory->manufacturer,
+                    'type' => $memory->type,
+                    'size' => $memory->size,
+                    'product_id' => $new_product->id,
+                    'slug' => $memory->slug
                 ]);
                 $new_ram = Ram::create([
-                    'manufacturer'=>$ram->manufacturer,
-                    'type'=>$ram->type,
-                    'memory'=>$ram->memory,
-                    'product_id'=>$new_product->id,
-                    'slug'=>$ram->slug
+                    'manufacturer' => $ram->manufacturer,
+                    'type' => $ram->type,
+                    'memory' => $ram->memory,
+                    'product_id' => $new_product->id,
+                    'slug' => $ram->slug
                 ]);
             } catch (HttpResponseException $exception) {
                 return response()->json([
@@ -186,7 +187,6 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::where('id', $id)->first()->with(['cpu', 'display', 'memory', 'ram', 'graphic']);
-//        dd($product);
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -219,7 +219,38 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product not found'
+            ], 404);
+        }
+        if($request->hasFile('product_img')) {
+            $url = Storage::disk('s3')->put('laptops/products_images', $request->file('product_img'));
+            $full_url = Storage::disk('s3')->url($url);
+            $product->image = $request->file('product_img') ? $full_url : '';
+            $product->save();
+        }
+        $keys = $request->keys();
+        $target = array_keys($product->toArray());
+        $res = array_intersect($keys, $target);
+        try {
+            foreach ($res as $key => $value) {
+                $product->$value = $request->$value;
+            }
+            $product->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'Success',
+                'product' => $product
+            ]);
+        } catch (HttpResponseException $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
+        }
     }
 
     /**
