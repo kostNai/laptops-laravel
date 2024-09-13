@@ -2,34 +2,35 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Routing\Controller;
 use App\Models\User;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['only' => ['store', 'destroy','update']]);
+        $this->middleware('auth', ['only' => ['store', 'destroy', 'update']]);
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $users = User::all();
+            $users = User::paginate(10);
             return response()->json([
-                'status'=>true,
-                'users'=>$users
+                'status' => true,
+                'users' => $users
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
     }
 
@@ -46,7 +47,48 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = new User();
+        $full_url = '';
+        if ($request->hasFile('user_img')) {
+            $url = Storage::disk('s3')->put('laptops/avatars', $request->file('user_img'));
+            $full_url = Storage::disk('s3')->url($url);
+            $user->img = $full_url;
+        }
+        $keys = $request->keys();
+        $username = User::where('username', $request->username)->first();
+        $email = User::where('email', $request->email)->first();
+        if ($request->username && $username) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Користувач з таким логіном вже існує, сробуйте інший варіант логіну'
+            ], 500);
+        }
+        if ($request->email && $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Такий email вже існує, спробуйте інший варіант'
+            ], 500);
+        }
+        try {
+            foreach ($keys as $key => $value) {
+                if ($value === 'is_admin') {
+                    $user->$value = $request->$value === 'true' ? 1 : 0;
+                } elseif($value !== 'user_img') {
+                    $user->$value = $request->$value;
+                }
+            }
+            $user->save();
+            return response()->json([
+                'status' => true,
+                'user' => $user
+            ]);
+        } catch (HttpResponseException $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
+        }
+
     }
 
     /**
@@ -54,19 +96,19 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-       $user = User::find($id);
+        $user = User::find($id);
 
-       if(!$user){
-           return response()->json([
-               'status'=>false,
-               'message'=>'User not found'
-           ],404);
-       }
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
 
-       return response()->json([
-           'status'=>true,
-           'user'=>$user
-       ]);
+        return response()->json([
+            'status' => true,
+            'user' => $user
+        ]);
     }
 
     /**
@@ -83,7 +125,7 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::find($id);
-        if($request->hasFile('user_img')) {
+        if ($request->hasFile('user_img')) {
             $url = Storage::disk('s3')->put('laptops/avatars', $request->file('user_img'));
             $full_url = Storage::disk('s3')->url($url);
             $user->img = $request->file('user_img') ? $full_url : '';
@@ -97,28 +139,32 @@ class UserController extends Controller
             ], 404);
         }
         $keys = $request->keys();
+
         $target = array_keys($user->toArray());
         $res = array_intersect($keys, $target);
 
-        $username = User::where('username',$request->username)->first();
-        $email = User::where('email',$request->email)->first();
-        if($request->username && $username){
-           return response()->json([
-               'status'=>false,
-               'message'=>'Користувач з таким логіном вже існує, сробуйте інший варіант логіну'
-           ], 500);
+        $username = User::where('username', $request->username)->first();
+        $email = User::where('email', $request->email)->first();
+        if ($request->username && $username) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Користувач з таким логіном вже існує, сробуйте інший варіант логіну'
+            ], 500);
         }
-        if($request->email && $email){
-           return response()->json([
-               'status'=>false,
-               'message'=>'Такий email вже існує, спробуйте інший варіант'
-           ],500);
+        if ($request->email && $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Такий email вже існує, спробуйте інший варіант'
+            ], 500);
         }
 
 
         try {
             foreach ($res as $key => $value) {
-                $user->$value = $request->$value;
+                if ($value === 'is_admin') {
+                    $user->$value = $request->$value === 'true' ? 1 : 0;
+                } else
+                    $user->$value = $request->$value;
             }
 
             $user->save();
@@ -142,24 +188,24 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if(!$user){
+        if (!$user) {
             return response()->json([
-                'status'=>false,
-                'message'=>'User not found'
+                'status' => false,
+                'message' => 'User not found'
             ]);
         }
         try {
             $user->delete();
 
             return response()->json([
-                'status'=>true,
-                'message'=>'Success'
+                'status' => true,
+                'message' => 'Success'
             ]);
-        }catch(HttpResponseException $exception){
+        } catch (HttpResponseException $exception) {
             return response()->json([
-                'status'=>false,
-                'message'=>$exception->getMessage()
-            ],$exception->getCode());
+                'status' => false,
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
         }
     }
 }
